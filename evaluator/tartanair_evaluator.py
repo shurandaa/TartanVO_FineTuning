@@ -2,7 +2,7 @@
 # For License information please see the LICENSE file in the root directory.
 
 import numpy as np
-from evaluator_base import ATEEvaluator, RPEEvaluator, KittiEvaluator, transform_trajs, quats2SEs
+from .evaluator_base import ATEEvaluator, RPEEvaluator, KittiEvaluator, transform_trajs, quats2SEs
 from os.path import isdir, isfile
 
 # from trajectory_transform import timestamp_associate
@@ -25,6 +25,8 @@ class TartanAirEvaluator:
             pass
 
         if gt_traj.shape[0] != est_traj.shape[0]:
+            print(gt_traj.shape[0])
+            print(est_traj.shape[0])
             raise Exception("POSEFILE_LENGTH_ILLEGAL")
         if gt_traj.shape[1] != 7 or est_traj.shape[1] != 7:
             raise Exception("POSEFILE_FORMAT_ILLEGAL")

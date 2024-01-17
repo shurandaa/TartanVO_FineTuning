@@ -1,5 +1,7 @@
+
 from torch.utils.data import DataLoader
-from Datasets.utils import ToTensor, Compose, CropCenter, dataset_intrinsics, DownscaleFlow, plot_traj, visflow
+from Datasets.utils import ToTensor, Compose, CropCenter, dataset_intrinsics, DownscaleFlow, plot_traj, visflow, \
+    load_kiiti_intrinsics
 from Datasets.tartanTrajFlowDataset import TrajFolderDataset
 from Datasets.transformation import ses2poses_quat
 from evaluator.tartanair_evaluator import TartanAirEvaluator
@@ -10,6 +12,8 @@ import numpy as np
 import cv2
 from os import mkdir
 from os.path import isdir
+
+
 
 def get_args():
     parser = argparse.ArgumentParser(description='HRL')
@@ -55,15 +59,15 @@ if __name__ == '__main__':
         datastr = 'euroc'
     else:
         datastr = 'tartanair'
-    focalx, focaly, centerx, centery = dataset_intrinsics(datastr) 
+    focalx, focaly, centerx, centery = dataset_intrinsics(datastr)
     if args.kitti_intrinsics_file.endswith('.txt') and datastr=='kitti':
         focalx, focaly, centerx, centery = load_kiiti_intrinsics(args.kitti_intrinsics_file)
 
     transform = Compose([CropCenter((args.image_height, args.image_width)), DownscaleFlow(), ToTensor()])
 
-    testDataset = TrajFolderDataset(args.test_dir,  posefile = args.pose_file, transform=transform, 
+    testDataset = TrajFolderDataset(args.test_dir,  posefile = args.pose_file, transform=transform,
                                         focalx=focalx, focaly=focaly, centerx=centerx, centery=centery)
-    testDataloader = DataLoader(testDataset, batch_size=args.batch_size, 
+    testDataloader = DataLoader(testDataset, batch_size=args.batch_size,
                                         shuffle=False, num_workers=args.worker_num)
     testDataiter = iter(testDataloader)
 
