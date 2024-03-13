@@ -6,7 +6,7 @@ from .transformation import pos_quats2SEs, pose2motion, SEs2ses
 from .utils import make_intrinsics_layer
 
 
-class TrajFolderDataset2(Dataset):
+class TrajFolderDataset(Dataset):
     """scene flow synthetic dataset. """
 
     def __init__(self, imgfolder, posefile=None, transform=None,
@@ -20,7 +20,7 @@ class TrajFolderDataset2(Dataset):
         print('Find {} image files in {}'.format(len(self.rgbfiles), imgfolder))
 
         if posefile is not None and posefile != "":
-            poselist = np.genfromtxt(posefile, delimiter=',', usecols=(1, 2, 3, 4, 5, 6, 7))
+            poselist = np.genfromtxt(posefile, delimiter=',', usecols=(1, 2, 3, 4, 5, 6, 7)).astype(np.float32)
             assert (poselist.shape[1] == 7)  # position + quaternion
             poses = pos_quats2SEs(poselist)
             self.matrix = pose2motion(poses)

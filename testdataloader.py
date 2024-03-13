@@ -1,7 +1,9 @@
 from torch.utils.data import DataLoader
-from Datasets import tartanTrajFlowDataset2
+from Datasets.tartanTrajFlowDataset2 import TrajFolderDataset
 # 假设你的数据集类名为 MyDataset
-dataset = tartanTrajFlowDataset2(imgfolder='path_to_images', posefile='path_to_poses.csv')
+
+dataset = TrajFolderDataset(imgfolder='data/SubT_MRS_t1/image_left',
+                                 posefile='data/SubT_MRS_t1/ground_truth_path.csv')
 
 # 创建DataLoader
 dataloader = DataLoader(dataset, batch_size=4, shuffle=True, num_workers=4)
