@@ -20,7 +20,7 @@ class TrajFolderDataset(Dataset):
         print('Find {} image files in {}'.format(len(self.rgbfiles), imgfolder))
 
         if posefile is not None and posefile != "":
-            poselist = np.genfromtxt(posefile, delimiter=',', usecols=(1, 2, 3, 4, 5, 6, 7), skip_header=1).astype(np.float32)
+            poselist = np.genfromtxt(posefile, delimiter=',', usecols=(1, 2, 3, 4, 5, 6, 7), skip_header=2).astype(np.float32)
             assert (poselist.shape[1] == 7)  # position + quaternion
             poses = pos_quats2SEs(poselist)
             self.matrix = pose2motion(poses)
