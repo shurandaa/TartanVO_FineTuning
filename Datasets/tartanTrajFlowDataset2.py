@@ -48,12 +48,13 @@ class TrajFolderDataset(Dataset):
         img1 = cv2.imread(imgfile1)
         img2 = cv2.imread(imgfile2)
 
+
+
         res = {'img1': img1, 'img2': img2}
 
         h, w, _ = img1.shape
         intrinsicLayer = make_intrinsics_layer(w, h, self.focalx, self.focaly, self.centerx, self.centery)
         res['intrinsic'] = intrinsicLayer
-
         if self.transform:
             res = self.transform(res)
 
