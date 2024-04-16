@@ -11,26 +11,27 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+import numpy as np
 
-def euler_to_rotation_matrix(euler_angles):
-    """将欧拉角转换为旋转矩阵"""
-    rx, ry, rz = euler_angles
-    cos_rx, cos_ry, cos_rz = np.cos(rx), np.cos(ry), np.cos(rz)
-    sin_rx, sin_ry, sin_rz = np.sin(rx), np.sin(ry), np.sin(rz)
 
-    Rx = np.array([[1, 0, 0],
-                   [0, cos_rx, -sin_rx],
-                   [0, sin_rx, cos_rx]])
+def rotation_vector_to_rotation_matrix(rotation_vector):
+    """将旋转向量转换为旋转矩阵"""
+    theta = np.linalg.norm(rotation_vector)  # 旋转向量的模，即旋转角度
+    if theta == 0:
+        return np.eye(3)  # 如果角度为0，返回单位矩阵
 
-    Ry = np.array([[cos_ry, 0, sin_ry],
-                   [0, 1, 0],
-                   [-sin_ry, 0, cos_ry]])
+    # 单位旋转轴
+    k = rotation_vector / theta
 
-    Rz = np.array([[cos_rz, -sin_rz, 0],
-                   [sin_rz, cos_rz, 0],
-                   [0, 0, 1]])
+    # 罗德里格斯公式的组件
+    K = np.array([[0, -k[2], k[1]],
+                  [k[2], 0, -k[0]],
+                  [-k[1], k[0], 0]])
+    I = np.eye(3)
 
-    return Rz @ Ry @ Rx  # 注意矩阵乘法的顺序
+    # 使用罗德里格斯公式计算旋转矩阵
+    R = I + np.sin(theta) * K + (1 - np.cos(theta)) * np.dot(K, K)
+    return R
 
 
 def main():
@@ -75,7 +76,7 @@ def main():
         input = (img1, img2, intrinsics)
         # 运行你的模型进行预测
         flow, pose = model(input)  # 根据你的模型具体实现调整
-        # print(flow)
+        print(pose)
         poses.append(pose.cpu().detach().numpy())
         ld = len(poses)/4000
         print(ld)
@@ -98,7 +99,7 @@ def main():
             trajectory[i] = trajectory[i - 1] + translation
 
         # 将欧拉角转换为旋转矩阵
-        R = euler_to_rotation_matrix(rotation)
+        R = rotation_vector_to_rotation_matrix(rotation)
 
         # 应用旋转矩阵到初始方向向量 (这里我们选择 z 轴方向的单位向量)
         direction = R @ np.array([0, 0, 1])
