@@ -82,7 +82,6 @@ def main():
         print(ld)
 
 
-
     # 初始化轨迹和方向向量
     trajectory = np.zeros((len(poses), 3))
     directions = np.zeros((len(poses), 3))
@@ -98,7 +97,7 @@ def main():
         else:
             trajectory[i] = trajectory[i - 1] + translation
 
-        # 将欧拉角转换为旋转矩阵
+        # 将旋转向量转换为旋转矩阵
         R = rotation_vector_to_rotation_matrix(rotation)
 
         # 应用旋转矩阵到初始方向向量 (这里我们选择 z 轴方向的单位向量)

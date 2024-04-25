@@ -38,7 +38,7 @@ def pose_loss_function(T_hat, T, R_hat, R, epsilon=1e-6):
 
     # 总的损失是平移损失和旋转损失的和
     total_loss = translation_loss + rotation_loss
-    return total_loss
+    return total_loss, rotation_loss, translation_loss
 
 
 def main():
@@ -89,15 +89,17 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-8, weight_decay=0, amsgrad=False)
 
     # 设置训练的总周期数
-    num_epochs = 10
+    num_epochs = 30
 
     for epoch in range(num_epochs):
         model.train()  # 设置模型为训练模式
         total_loss = 0  # 用于累积每个epoch的损失
+        max_rt_loss = 0  # 初始化旋转损失的最大值
+        max_tra_loss = 0  # 初始化平移损失的最大值
 
         # 遍历训练数据加载器中的所有批次
         for batch_idx, batch in enumerate(train_dataloader):
-            print(batch_idx)#tqdm
+            #tqdm
             # 将数据移到正确的设备上（例如，GPU）
             img1, img2, intrinsics, pose = batch['img1'].to("cuda"), batch['img2'].to("cuda"), batch['intrinsic'].to(
                 "cuda"), batch['motion'].to("cuda")
@@ -116,16 +118,20 @@ def main():
             R = pose[:, 3:]
 
             # 计算损失，这里调用了自定义的损失函数
-            loss = pose_loss_function(T_hat, T, R_hat, R)
-
+            loss, rt_loss, tra_loss = pose_loss_function(T_hat, T, R_hat, R)
+            print(rt_loss, tra_loss)
             loss.backward()  # 执行反向传播
             optimizer.step()  # 更新模型参数
 
             total_loss += loss.item()  # 累积损失
+            if rt_loss.item() > max_rt_loss:
+                max_rt_loss = rt_loss.item()
+            if tra_loss.item() > max_tra_loss:
+                max_tra_loss = tra_loss.item()
 
         # 计算这个epoch的平均损失
         avg_loss = total_loss / len(train_dataloader)
-        print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}')
+        print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}, Max Rt Loss: {max_rt_loss:.4f}, Max Tra Loss: {max_tra_loss:.4f}')
 
         # 每训练五次保存一次模型
         if (epoch + 1) % 5 == 0:
