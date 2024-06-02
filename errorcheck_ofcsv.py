@@ -20,7 +20,7 @@ def check_csv_format(file_path):
             print("No formatting errors found in the file.")
 
 def main():
-    file_path = input("data/SubT_MRS_t1/evaluateData.csv")
+    file_path = input("data/SubT_MRS_t1/originalPredictedData.csv")
     check_csv_format(file_path)
 
 if __name__ == "__main__":

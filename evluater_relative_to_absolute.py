@@ -61,7 +61,7 @@ def relative_to_absolute_trajectory(gt_file, pre_file):
 def main():
     # 读取groundtruth文件和预测文件
     gt_trajectory = read_trajectory_csv('data/SubT_MRS_t1/groundtruthData.csv')
-    relative_transforms = read_trajectory_csv('data/SubT_MRS_t1/evaluateData.csv')
+    relative_transforms = read_trajectory_csv('data/SubT_MRS_t1/originalPredictedData.csv')
     print(len(gt_trajectory))
     print(len(relative_transforms))
 
@@ -73,7 +73,7 @@ def main():
     abs_trajectory = abs_trajectory[:-1]
 
     # 将生成的绝对轨迹写入新的文件
-    write_trajectory_csv('data/SubT_MRS_t1/evo_using_predict/evaluateData.csv', abs_trajectory)
+    write_trajectory_csv('data/SubT_MRS_t1/evo_using_predict/originalPredictedData.csv', abs_trajectory)
 
 if __name__ == '__main__':
     # 调用 main 函数

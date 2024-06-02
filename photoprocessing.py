@@ -15,7 +15,7 @@ def returnPt(pt_time, ground_truth):
     selected_indices = []  # 存储选中的图片时间戳的序号
 
     # 遍历每两个连续的运动数据时间戳
-    for i in range(1, len(motion_timestamps) - 1):
+    for i in range(len(motion_timestamps) - 1):
         start = motion_timestamps[i]
         end = motion_timestamps[i + 1]
 

@@ -51,8 +51,9 @@ def combine_timestamps_with_poses(timestamps_path, predicted_poses, output_path)
         total_lines = len(file.readlines())
 
     # 读取时间戳数据
-    timestamps_df = pd.read_csv(timestamps_path, skiprows=[1], nrows=total_lines-2)
-
+    timestamps_df = pd.read_csv(timestamps_path)
+    timestamps_df = timestamps_df.iloc[:-2]
+    print(len(timestamps_df))
     # 确保时间戳列存在
     if 'timestamp' not in timestamps_df.columns:
         raise ValueError("Timestamps file must contain a 'timestamp' column.")
@@ -61,13 +62,13 @@ def combine_timestamps_with_poses(timestamps_path, predicted_poses, output_path)
     timestamps = timestamps_df['timestamp']
 
     # 检查时间戳数量是否与预测姿态的数量匹配
-    if len(timestamps)-1 != len(predicted_poses):
+    if len(timestamps) != len(predicted_poses):
         raise ValueError("The number of timestamps does not match the number of predicted poses.")
 
-    final_timestamps = timestamps[1:]
+
 
     # 将时间戳与预测姿态结合
-    full_data = np.column_stack((final_timestamps, predicted_poses))
+    full_data = np.column_stack((timestamps, predicted_poses))
 
     # 生成输出文件路径，并检查是否存在相同文件名，如果存在则增加序号
     index = 1
@@ -90,7 +91,7 @@ def main():
     # 加载和初始化模型
     model = VONet()
     # 加载权重
-    state_dict = torch.load('models/finetune_final.pth', map_location=torch.device('cuda'))  # 可以指定为 'cpu' 或你的 GPU 设备
+    state_dict = torch.load('models/tartanvo_1914.pkl', map_location=torch.device('cuda'))  # 可以指定为 'cpu' 或你的 GPU 设备
 
     # 检查是否使用了 DataParallel 并移除 'module.' 前缀
     new_state_dict = {k.replace('module.', ''): v for k, v in state_dict.items()}
@@ -134,6 +135,7 @@ def main():
 
     timestamps_path = 'data/SubT_MRS_t1/ground_truth_path.csv'
     output_path = 'data/SubT_MRS_t1'
+    print(len(poses))
 
         # 结合时间戳和预测姿态，并存储结果
     combine_timestamps_with_poses(timestamps_path, poses, output_path)

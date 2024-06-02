@@ -45,5 +45,5 @@ def calculate_ate(gt_file, est_file):
 
 
 if __name__ == "__main__":
-    calculate_ate("data/SubT_MRS_t1/groundtruthData.csv", "data/SubT_MRS_t1/evo_using_predict/evaluateData.csv")
+    calculate_ate("data/SubT_MRS_t1/groundtruthData.csv", "data/SubT_MRS_t1/evo_using_predict/originalPredictedData.csv")
 

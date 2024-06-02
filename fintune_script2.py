@@ -56,7 +56,7 @@ def main():
         centery=240.0
     )
 
-    subset_indices = list(range(1000))
+    subset_indices = list(range(500))
     train_subset = Subset(train_dataset, subset_indices)
 
     train_dataloader = DataLoader(
@@ -89,10 +89,10 @@ def main():
         elif not param.requires_grad and 'flowNet' in name:
             print(f"参数 {name} 已被冻结，不会被更新.")
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-8, weight_decay=0, amsgrad=False)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, betas=(0.9, 0.999), eps=1e-8, weight_decay=0, amsgrad=False)
 
     # 设置训练的总周期数
-    num_epochs = 10
+    num_epochs = 20
 
     for epoch in range(num_epochs):
         model.train()  # 设置模型为训练模式
@@ -119,10 +119,8 @@ def main():
             # 从真实的pose中分离平移向量和旋转向量
             T = pose[:, :3]
             R = pose[:, 3:]
-            print(R)
             # 计算损失，这里调用了自定义的损失函数
             loss, rt_loss, tra_loss = pose_loss_function(T_hat, T, R_hat, R)
-            print(rt_loss, tra_loss)
             loss.backward()  # 执行反向传播
             optimizer.step()  # 更新模型参数
 
@@ -137,7 +135,7 @@ def main():
         print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {avg_loss:.4f}, Max Rt Loss: {max_rt_loss:.4f}, Max Tra Loss: {max_tra_loss:.4f}')
 
         # 每训练五次保存一次模型
-        if (epoch + 1) % 5 == 0:
+        if (epoch + 1) % 1 == 0:
             save_path = f'models/finetune{epoch + 1}.pth'  # 设置模型保存路径和名称
             torch.save(model.state_dict(), save_path)
             print(f'Model saved to {save_path}')
