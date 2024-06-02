@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from Network.VONet import VONet  # 模型定义
 from torchvision import transforms
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 from Datasets.tartanTrajFlowDataset2 import TrajFolderDataset
 from Datasets.utils import ToTensor, Compose, CropCenter, dataset_intrinsics, DownscaleFlow, plot_traj, visflow
 
@@ -11,7 +11,8 @@ def lie_algebra_loss(R_hat_quaternion, R_quaternion):
 
 
     # 计算旋转损失为预测和真实李代数元素之间的欧氏距离
-    rotation_loss = torch.norm(R_hat_quaternion - R_quaternion, dim=1).mean()
+    rotation_loss = torch.norm(R_hat_quaternion - R_quaternion, dim=-1).mean()
+
 
     return rotation_loss
 
@@ -55,9 +56,11 @@ def main():
         centery=240.0
     )
 
+    subset_indices = list(range(1000))
+    train_subset = Subset(train_dataset, subset_indices)
 
     train_dataloader = DataLoader(
-        train_dataset,
+        train_subset,
         batch_size=1,  # 根据你的需求调整批量大小
         shuffle=False,  # 对于预测，通常不需要打乱数据
         num_workers=2  # 根据你的系统配置调整工作线程数
@@ -89,7 +92,7 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-8, weight_decay=0, amsgrad=False)
 
     # 设置训练的总周期数
-    num_epochs = 30
+    num_epochs = 10
 
     for epoch in range(num_epochs):
         model.train()  # 设置模型为训练模式
@@ -109,14 +112,14 @@ def main():
             # 执行前向传播，获取模型的输出
             _, pose_hat = model(input)
 
-            # 从模型输出中分离平移向量和旋转四元数
+            # 从模型输出中分离平移向量和旋转向量
             T_hat = pose_hat[:, :3]  # 假设前三个数是平移向量
             R_hat = pose_hat[:, 3:]  # 假设后四个数是旋转的四元数
 
-            # 从真实的pose中分离平移向量和旋转四元数
+            # 从真实的pose中分离平移向量和旋转向量
             T = pose[:, :3]
             R = pose[:, 3:]
-
+            print(R)
             # 计算损失，这里调用了自定义的损失函数
             loss, rt_loss, tra_loss = pose_loss_function(T_hat, T, R_hat, R)
             print(rt_loss, tra_loss)

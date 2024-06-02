@@ -15,13 +15,13 @@ def returnPt(pt_time, ground_truth):
     selected_indices = []  # 存储选中的图片时间戳的序号
 
     # 遍历每两个连续的运动数据时间戳
-    for i in range(len(motion_timestamps) - 1):
+    for i in range(1, len(motion_timestamps) - 1):
         start = motion_timestamps[i]
         end = motion_timestamps[i + 1]
 
         # 在两个运动时间戳之间查找图片时间戳
         for index, timestamp in enumerate(image_timestamps):
-            if start < int(timestamp) < end:
+            if start <= int(timestamp) < end:
                 selected_indices.append(index)
                 break  # 找到第一个就停止，如果需要找所有位于两个时间戳之间的图片，可以去掉这个break
 
@@ -83,4 +83,4 @@ if __name__ == '__main__':
     list1 = returnPt(timestampsDir, gdthDir)
     clear_images_in_folder(target)
     copy_selected_images(list1, ImageDir, target)
-    print(list1)
+    print(len(list1))

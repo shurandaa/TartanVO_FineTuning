@@ -90,7 +90,7 @@ def main():
     # 加载和初始化模型
     model = VONet()
     # 加载权重
-    state_dict = torch.load('models/tartanvo_1914.pkl', map_location=torch.device('cuda'))  # 可以指定为 'cpu' 或你的 GPU 设备
+    state_dict = torch.load('models/finetune_final.pth', map_location=torch.device('cuda'))  # 可以指定为 'cpu' 或你的 GPU 设备
 
     # 检查是否使用了 DataParallel 并移除 'module.' 前缀
     new_state_dict = {k.replace('module.', ''): v for k, v in state_dict.items()}

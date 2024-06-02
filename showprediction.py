@@ -70,6 +70,7 @@ def main():
     num = 0
     for batch in dataloader:
         # 这里的 batch 是一个字典，包含了你的数据和任何其他相关信息，比如内参矩阵和运动（如果提供了位姿文件）
+        num+=1
         img1 = batch["img1"].to("cuda")
         img2 = batch["img2"].to("cuda")  # 例如，取出图像对
         intrinsics = batch["intrinsic"].to("cuda")  # 取出内参矩阵
@@ -80,6 +81,9 @@ def main():
         poses.append(pose.cpu().detach().numpy())
         ld = len(poses)/4000
         print(ld)
+        if(num==300):
+            break
+
 
 
     # 初始化轨迹和方向向量
