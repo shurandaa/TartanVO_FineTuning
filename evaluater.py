@@ -3,7 +3,7 @@ import numpy as np
 import torch
 from Network.VONet import VONet  # 模型定义
 from torchvision import transforms
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader,Subset
 from Datasets.tartanTrajFlowDataset2 import TrajFolderDataset
 from Datasets.utils import ToTensor, Compose, CropCenter, dataset_intrinsics, DownscaleFlow, plot_traj, visflow
 import matplotlib
@@ -52,14 +52,14 @@ def combine_timestamps_with_poses(timestamps_path, predicted_poses, output_path)
 
     # 读取时间戳数据
     timestamps_df = pd.read_csv(timestamps_path)
-    timestamps_df = timestamps_df.iloc[:-2]
+    timestamps_df = timestamps_df.iloc[:-1]
     print(len(timestamps_df))
     # 确保时间戳列存在
-    if 'timestamp' not in timestamps_df.columns:
+    if '#timestamp' not in timestamps_df.columns:
         raise ValueError("Timestamps file must contain a 'timestamp' column.")
 
     # 获取时间戳列
-    timestamps = timestamps_df['timestamp']
+    timestamps = timestamps_df['#timestamp']
 
     # 检查时间戳数量是否与预测姿态的数量匹配
     if len(timestamps) != len(predicted_poses):
@@ -113,11 +113,15 @@ def main():
         centerx=320.0,
         centery=240.0
     )
+    # 创建子集
+    subset_indices = list(range(500))
+    subset_dataset = Subset(dataset, subset_indices)
+
     dataloader = DataLoader(
         dataset,
         batch_size=1,  # 根据你的需求调整批量大小
         shuffle=False,  # 对于预测，通常不需要打乱数据
-        num_workers=2  # 根据你的系统配置调整工作线程数
+        num_workers=1  # 根据你的系统配置调整工作线程数
     )
     poses = []
     num = 0
@@ -133,8 +137,11 @@ def main():
         print(f"七位数组是{pd_pose}")
         poses.append(pd_pose)
 
-    timestamps_path = 'data/SubT_MRS_t1/ground_truth_path.csv'
-    output_path = 'data/SubT_MRS_t1'
+        del img1, img2, intrinsics, input, pose
+        torch.cuda.empty_cache()
+
+    timestamps_path = 'data/eURoc_Data/groundtruthSelected.csv'
+    output_path = 'data/eURoc_Data'
     print(len(poses))
 
         # 结合时间戳和预测姿态，并存储结果
