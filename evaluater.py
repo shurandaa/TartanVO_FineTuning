@@ -140,8 +140,8 @@ def main():
         del img1, img2, intrinsics, input, pose
         torch.cuda.empty_cache()
 
-    timestamps_path = 'data/eURoc_Data/groundtruthSelected.csv'
-    output_path = 'data/eURoc_Data'
+    timestamps_path = 'data/eURoc_DataMH4/groundtruthSelected.csv'
+    output_path = 'data/eURoc_DataMH4'
     print(len(poses))
 
         # 结合时间戳和预测姿态，并存储结果

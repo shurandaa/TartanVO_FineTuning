@@ -8,8 +8,8 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.animation import FuncAnimation
 
 # 读取两个CSV文件
-data1 = pd.read_csv('data/SubT_MRS_t1/groundtruthData.csv', header=None).head(4000)
-data2 = pd.read_csv('data/SubT_MRS_t1/evo_using_predict/originalPredictedData.csv', header=None).head(4000)
+data1 = pd.read_csv('data/eURoc_Data/groundtruthSelected.csv', header=None)#.head(4000)
+data2 = pd.read_csv('data/eURoc_Data/originalPredictedData.csv', header=None)#.head(4000)
 
 # 创建3D图形和两个子图
 fig = plt.figure()

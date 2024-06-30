@@ -88,12 +88,12 @@ def copyGroundtruth(number_list, target_groundtruth, groundtruth):
 
 
 if __name__ == '__main__':
-    ImageDir = 'data/eURoc_Data/data'
-    timestampsDir = 'data/eURoc_Data/data/data.csv'
-    gdthDir = 'data/eURoc_Data/data.csv'
+    ImageDir = 'data/eURoc_DataMH4/data'
+    timestampsDir = 'data/eURoc_DataMH4/data/data.csv'
+    gdthDir = 'data/eURoc_DataMH4/data.csv'
     target = 'data/targetImageFolder'
-    image_data = pd.read_csv('data/eURoc_Data/data/data.csv')
-    targetgroundtruth = 'data/eURoc_Data/groundtruthSelected.csv'
+    image_data = pd.read_csv('data/eURoc_DataMH4/data/data.csv')
+    targetgroundtruth = 'data/eURoc_DataMH4/groundtruthSelected.csv'
     list1, list2 = returnPt(timestampsDir, gdthDir)
     clear_images_in_folder(target)
     copy_selected_images(list1, ImageDir, target, image_data)

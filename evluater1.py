@@ -7,7 +7,7 @@ def gd_truth_processing(gd_truth_route, output_path):
     with open(gd_truth_route, 'r') as file:
         total_lines = len(file.readlines())
 
-    gd_truth_to_process = pd.read_csv(gd_truth_route, nrows=total_lines-3)
+    gd_truth_to_process = pd.read_csv(gd_truth_route).iloc[:-1]
 
     # 生成输出文件路径，并检查是否存在相同文件名，如果存在则增加序号
     index = 1
