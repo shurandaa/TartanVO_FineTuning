@@ -139,7 +139,7 @@ def sos2quats(so_datas,mean_std=[[1],[1]]):
     return quat_datas
 
 def SO2quat(SO_data):
-    rr = R.from_dcm(SO_data)
+    rr = R.from_matrix(SO_data)
     return rr.as_quat()
 
 def quat2SO(quat_data):

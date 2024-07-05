@@ -121,15 +121,15 @@ def sos2quats(so_datas,mean_std=[[1],[1]]):
     return quat_datas
 
 def SO2quat(SO_data):
-    rr = R.from_dcm(SO_data)
+    rr = R.from_matrix(SO_data)
     return rr.as_quat()
 
 def quat2SO(quat_data):
-    return R.from_quat(quat_data).as_dcm()
+    return R.from_quat(quat_data).as_matrix()
 
 
 def pos_quat2SE(quat_data):
-    SO = R.from_quat(quat_data[3:7]).as_dcm()
+    SO = R.from_quat(quat_data[3:7]).as_matrix()
     SE = np.matrix(np.eye(4))
     SE[0:3,0:3] = np.matrix(SO)
     SE[0:3,3]   = np.matrix(quat_data[0:3]).T
@@ -150,7 +150,7 @@ def pos_quats2SE_matrices(quat_datas):
     data_len = quat_datas.shape[0]
     SEs = []
     for quat in quat_datas:
-        SO = R.from_quat(quat[3:7]).as_dcm()
+        SO = R.from_quat(quat[3:7]).as_matrix()
         SE = np.eye(4)
         SE[0:3,0:3] = SO
         SE[0:3,3]   = quat[0:3]

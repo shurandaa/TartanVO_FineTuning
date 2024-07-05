@@ -5,7 +5,7 @@ from torchvision import transforms
 from torch.utils.data import DataLoader, Subset
 from Datasets.tartanTrajFlowDataset2 import TrajFolderDataset
 from Datasets.utils import ToTensor, Compose, CropCenter, dataset_intrinsics, DownscaleFlow, plot_traj, visflow
-
+from torchvision.transforms import Normalize
 
 def lie_algebra_loss(R_hat_quaternion, R_quaternion):
 
@@ -44,7 +44,8 @@ def pose_loss_function(T_hat, T, R_hat, R, epsilon=1e-6):
 
 def main():
     # 定义预处理步骤
-    transform = Compose([CropCenter((640, 448)), DownscaleFlow(), ToTensor()])
+    transform = Compose([CropCenter((640, 448)), DownscaleFlow(), ToTensor(),
+                         Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]) ])
 
     train_dataset = TrajFolderDataset(
         imgfolder="data/targetImageFolder",

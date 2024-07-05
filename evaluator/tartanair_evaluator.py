@@ -4,8 +4,9 @@
 import numpy as np
 from .evaluator_base import ATEEvaluator, RPEEvaluator, KittiEvaluator, transform_trajs, quats2SEs
 from os.path import isdir, isfile
-
+import  pandas as pd
 # from trajectory_transform import timestamp_associate
+
 
 class TartanAirEvaluator:
     def __init__(self, scale = False, round=1):
@@ -43,6 +44,43 @@ class TartanAirEvaluator:
                 'rpe_score': rpe_score, 
                 'kitti_score': kitti_score,
                 'gt_aligned': gt_ate_aligned, 
+                'est_aligned': est_ate_aligned}
+
+    def evaluate_one_trajectorycsv(self, gt_traj, est_traj, scale=False, kittitype=True):
+        """
+        scale = True: calculate a global scale
+        """
+        # load trajectories
+        try:
+            gt_traj  = np.genfromtxt(gt_traj, delimiter=',', usecols=(1, 2, 3, 4, 5, 6, 7), skip_header=1).astype(
+            np.float32)
+            i, j = 3, 6
+
+            # 交换列的位置
+            gt_traj[:, [i, j]] = gt_traj[:, [j, i]]
+            est_traj = np.loadtxt(est_traj)
+        except:
+            pass
+
+        if gt_traj.shape[0] != est_traj.shape[0]:
+            print(gt_traj.shape[0])
+            print(est_traj.shape[0])
+            raise Exception("POSEFILE_LENGTH_ILLEGAL")
+        if gt_traj.shape[1] != 7 or est_traj.shape[1] != 7:
+            raise Exception("POSEFILE_FORMAT_ILLEGAL")
+
+        # transform and scale
+        gt_traj_trans, est_traj_trans, s = transform_trajs(gt_traj, est_traj, scale)
+        gt_SEs, est_SEs = quats2SEs(gt_traj_trans, est_traj_trans)
+
+        ate_score, gt_ate_aligned, est_ate_aligned = self.ate_eval.evaluate(gt_traj, est_traj, scale)
+        rpe_score = self.rpe_eval.evaluate(gt_SEs, est_SEs)
+        kitti_score = self.kitti_eval.evaluate(gt_SEs, est_SEs, kittitype=kittitype)
+
+        return {'ate_score': ate_score,
+                'rpe_score': rpe_score,
+                'kitti_score': kitti_score,
+                'gt_aligned': gt_ate_aligned,
                 'est_aligned': est_ate_aligned}
 
 if __name__ == "__main__":

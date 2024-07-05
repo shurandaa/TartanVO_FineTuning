@@ -7,7 +7,9 @@ from mpl_toolkits.mplot3d import Axes3D
 
 # 读取两个CSV文件
 data1 = pd.read_csv('data/eURoc_DataMH4/归一化数据/groundtruthData_aligned.csv', header=None)
-data2 = pd.read_csv('data/eURoc_DataMH4/归一化数据/originalPredictedData_aligned.csv', header=None)
+data2 = pd.read_csv('data/eURoc_DataMH4/estimateDataByofficial.csv', header=None)
+
+
 
 # 创建3D图形和两个子图
 fig = plt.figure()
