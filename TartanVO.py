@@ -47,12 +47,36 @@ class TartanVO(object):
         if model_name.endswith('.pkl'):
             modelname = 'models/' + model_name
             self.load_model(self.vonet, modelname)
+        elif model_name.endswith('.pth'):
+            modelname = 'models/' + model_name
+            self.load_pthmodel(self.vonet, modelname)
+
 
         self.vonet.cuda()
 
         self.test_count = 0
         self.pose_std = np.array([ 0.13,  0.13,  0.13,  0.013 ,  0.013,  0.013], dtype=np.float32) # the output scale factor
         self.flow_norm = 20 # scale factor for flow
+
+    def load_pthmodel(self, model, modelname):
+        preTrainDict = torch.load(modelname)
+        model_dict = model.state_dict()
+        preTrainDictTemp = {k: v for k, v in preTrainDict.items() if k in model_dict}
+
+        if 0 == len(preTrainDictTemp):
+            print("Does not find any module to load. Try DataParallel version.")
+            for k, v in preTrainDict.items():
+                kk = k[7:]
+                if kk in model_dict:
+                    preTrainDictTemp[kk] = v
+
+        if 0 == len(preTrainDictTemp):
+            raise Exception("Could not load model from %s." % (modelname), "load_pth_model")
+
+        model_dict.update(preTrainDictTemp)
+        model.load_state_dict(model_dict)
+        print('PTH Model loaded...')
+        return model
 
     def load_model(self, model, modelname):
         preTrainDict = torch.load(modelname)

@@ -69,6 +69,7 @@ if __name__ == '__main__':
                                 shuffle=False, num_workers=args.worker_num)
     testDataiter = iter(testDataloader)
     motionlist = []
+    motionGtlist = []
     testname = datastr + '_' + args.model_name.split('.')[0]
     while True:
         try:
@@ -78,8 +79,14 @@ if __name__ == '__main__':
 
         motions, flow = testvo.test_batch(sample)
         motionlist.extend(motions)
-        poselist = ses2poses_quat(np.array(motionlist))
-        to_csv(poselist, args.savePose)
+        #motionsGt = sample['motion']
+        #motionGtlist.extend(motionsGt)
+
+
+    poselist = ses2poses_quat(np.array(motionlist))
+    poselistGt = ses2poses_quat(np.array(motionGtlist))
+    to_csv(poselist, args.savePose)
+    #to_csv(poselistGt, args.savePose)
 
 
     if args.pose_file.endswith('.txt'):
@@ -90,6 +97,7 @@ if __name__ == '__main__':
         # save results and visualization
         plot_traj(results['gt_aligned'], results['est_aligned'], vis=False, savefigname='results/'+testname+'.png', title='ATE %.4f' %(results['ate_score']))
         np.savetxt('results/'+testname+'.txt', results['est_aligned'])
+
     elif args.pose_file.endswith('.csv'):
         evaluator = TartanAirEvaluator()
         results = evaluator.evaluate_one_trajectorycsv(args.pose_file, poselist, scale=True)

@@ -54,10 +54,6 @@ class TartanAirEvaluator:
         try:
             gt_traj  = np.genfromtxt(gt_traj, delimiter=',', usecols=(1, 2, 3, 4, 5, 6, 7), skip_header=1).astype(
             np.float32)
-            i, j = 3, 6
-
-            # 交换列的位置
-            gt_traj[:, [i, j]] = gt_traj[:, [j, i]]
             est_traj = np.loadtxt(est_traj)
         except:
             pass

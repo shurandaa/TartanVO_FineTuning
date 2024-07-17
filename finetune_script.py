@@ -256,7 +256,7 @@ def main():
             print(f'Model saved to {save_path}')
 
         # 可以选择在训练完成后再保存一次模型
-    torch.save(model.state_dict(), 'models/finetune_final.pth')
+    torch.save(model.state_dict(), 'models/第一次训练50epoch/finetune_final.pth')
     print('Final model saved to models/finetune_final.pth')
 
 
