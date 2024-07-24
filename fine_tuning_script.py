@@ -8,6 +8,7 @@ from Datasets.utils import ToTensor, Compose, CropCenter, dataset_intrinsics, Do
 from torchvision.transforms import Normalize
 import pandas as pd
 from TartanVO import TartanVO
+import pypose as pp
 
 
 def lie_algebra_loss(R_hat_quaternion, R_quaternion):
@@ -30,15 +31,11 @@ def pose_loss_function(T_hat, T, R_hat, R, epsilon=1e-6):
     归一化距离损失 L_{norm\_p}
     """
     # 归一化平移向量，并计算预测和真实平移向量之间的欧几里得距离
-    T_hat_norm = T_hat / torch.max(torch.norm(T_hat, dim=1, keepdim=True), torch.tensor(epsilon).to(T_hat.device))
-    T_norm = T / torch.max(torch.norm(T, dim=1, keepdim=True), torch.tensor(epsilon).to(T.device))
-    translation_loss = torch.norm(T_hat_norm - T_norm, dim=1).mean()
 
-    # 计算预测和真实旋转之间的差异
+    translation_loss = ((T_hat - T) ** 2).mean()
     rotation_loss = lie_algebra_loss(R_hat, R)
-
-    # 总的损失是平移损失和旋转损失的和
-    total_loss = translation_loss + rotation_loss
+    # 总的损失是平移损失
+    total_loss = translation_loss
     return total_loss, rotation_loss, translation_loss
 
 
@@ -59,8 +56,8 @@ def main():
     )
 
     # 将数据集分为前1350个用于训练，剩余部分用于验证
-    train_indices = list(range(1350))
-    val_indices = list(range(1350, len(train_dataset)))
+    train_indices = list(range(900))
+    val_indices = list(range(900, len(train_dataset)))
 
     train_subset = Subset(train_dataset, train_indices)
     val_subset = Subset(train_dataset, val_indices)
@@ -84,20 +81,28 @@ def main():
 
     for param in model.vonet.flowNet.parameters():
         param.requires_grad = False
+    for param in model.vonet.flowPoseNet.parameters():
+        param.requires_grad = False
 
-    # 确认 FlowNet 部分的参数已经被冻结
+        # 仅解冻最后一层参数
+    for param in model.vonet.flowPoseNet.voflow_trans.parameters():
+        param.requires_grad = True
+    for param in model.vonet.flowPoseNet.voflow_rot.parameters():
+        param.requires_grad = True
+
+        # 确认冻结状态
     for name, param in model.vonet.named_parameters():
-        if param.requires_grad and 'flowNet' in name:
+        if param.requires_grad:
             print(f"参数 {name} 将会被更新.")
-        elif not param.requires_grad and 'flowNet' in name:
+        else:
             print(f"参数 {name} 已被冻结，不会被更新.")
 
-    optimizer = torch.optim.Adam(model.vonet.parameters(), lr=0.0001, betas=(0.9, 0.999), eps=1e-8, weight_decay=0,
+    optimizer = torch.optim.Adam(model.vonet.parameters(), lr=0.00005, betas=(0.9, 0.999), eps=1e-8, weight_decay=0,
                                  amsgrad=False)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.5)  # 学习率调度器
 
     # 设置训练的总周期数
-    num_epochs = 150
+    num_epochs = 200
 
     # 用于记录训练和验证损失的列表
     training_log = []
@@ -196,17 +201,17 @@ def main():
 
         # 每训练五次保存一次模型
         if (epoch + 1) % 1 == 0:
-            save_path = f'models/第五次训练/finetuneEuroc{epoch + 1}.pkl'  # 设置模型保存路径和名称
+            save_path = f'models/解冻pose与rot并将二模型结合/finetuneEuroc{epoch + 1}.pkl'  # 设置模型保存路径和名称
             torch.save(model.vonet.state_dict(), save_path)
             print(f'Model saved to {save_path}')
 
         # 可以选择在训练完成后再保存一次模型
-    torch.save(model.vonet.state_dict(), 'models/第五次训练/finetune_final.pkl')
+    torch.save(model.vonet.state_dict(), 'models/解冻pose与rot并将二模型结合/finetune_final.pkl')
     print('Final model saved ')
 
     # 保存训练和验证损失到CSV文件
     df = pd.DataFrame(training_log)
-    df.to_csv('models/第五次训练/training_log.csv', index=False)
+    df.to_csv('models/解冻pose与rot并将二模型结合/training_log.csv', index=False)
 
 
 if __name__ == '__main__':

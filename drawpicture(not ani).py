@@ -7,7 +7,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 # 读取两个CSV文件
 data1 = pd.read_csv('data/eURoc_DataMH4/groundtruthData.csv', header=None)
-data2 = pd.read_csv('data/eURoc_DataMH4/数据/5th.csv', header=None)
+data2 = pd.read_csv('data/eURoc_DataMH4/数据/11th.csv', header=None)
 
 
 

@@ -1,4 +1,4 @@
-from torch.utils.data import DataLoader, Subset
+from torch.utils.data import DataLoader,Subset
 from Datasets.utils import ToTensor, Compose, CropCenter, dataset_intrinsics, DownscaleFlow, plot_traj, visflow, \
     load_kiiti_intrinsics
 from Datasets.tartanTrajFlowDatasetForEvaluater import TrajFolderDataset
@@ -33,6 +33,8 @@ def get_args():
                         help='image width (default: 640)')
     parser.add_argument('--image-height', type=int, default=448,
                         help='image height (default: 448)')
+    parser.add_argument('--origin-model', default='',
+                        help='name of pretrained model (default: "")')
     parser.add_argument('--model-name', default='',
                         help='name of pretrained model (default: "")')
     parser.add_argument('--euroc', action='store_true', default=False,
@@ -53,6 +55,7 @@ if __name__ == '__main__':
     args = get_args()
 
     testvo = TartanVO(args.model_name)
+    originvo = TartanVO(args.origin_model)
 
     datastr = 'tartanair'
     if args.euroc:
@@ -71,6 +74,7 @@ if __name__ == '__main__':
                                 shuffle=False, num_workers=args.worker_num)
     testDataiter = iter(testDataloader)
     motionlist = []
+    Originalmotionlist = []
     testname = datastr + '_' + args.model_name.split('.')[0]
     while True:
         try:
@@ -79,7 +83,14 @@ if __name__ == '__main__':
             break
 
         motions, flow = testvo.test_batch(sample)
+        originmotions, originflow = originvo.test_batch(sample)
         motionlist.extend(motions)
+        Originalmotionlist.extend(originmotions)
+        motionlist = np.array(motionlist)
+        Originalmotionlist = np.array(Originalmotionlist)
+        motionlist[:, -3:] = Originalmotionlist[:, -3:]
+        motionlist = motionlist.tolist()
+        Originalmotionlist = Originalmotionlist.tolist()
         poselist = ses2poses_quat(np.array(motionlist))
         to_csv(poselist, args.savePose)
 
