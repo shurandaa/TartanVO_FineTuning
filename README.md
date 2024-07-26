@@ -1,7 +1,7 @@
 # TartanVO Fine-Tuning Project
 
-This project is based on the TartanVO model and focuses on fine-tuning it using several trajectories from the Euroc dataset. Follow the instructions below to successfully run the fine-tuning and evaluation processes.You need to first complete the TartanVO environment setup according to https://github.com/castacks/tartanvo , and delete the folders in TartanVO that are duplicated in my code, then replace them with my folders.Or you can also repo my code and set up the environment accroding to the file readme_tartanvo.md
-Make sure the code on your computer has another three folders ,they are the "models"(the models of tartanvo and you trained are inside ),"data"(put your fine-tuning track inside),"results"(saving the output result of FinalEvaluater.py and Evaluater_combine.py)
+This project is based on the TartanVO model and focuses on fine-tuning it using several trajectories from the Euroc dataset. Follow the instructions below to successfully run the fine-tuning and evaluation processes.You need to first complete the TartanVO environment setup according to https://github.com/castacks/tartanvo , and delete the folders in TartanVO that are duplicated in my code, then replace them with my folders.Or you can also repo my code and set up the environment accroding to the file readme_tartanvo.md.
+Make sure the code on your computer has another three folders ,they are the "models"(the models of tartanvo and you trained are inside ),"data"(put your fine-tuning track inside),"results"(saving the output result of FinalEvaluater.py and Evaluater_combine.py).
 This project can effectively reduce the error of any trajectory after fine-tuning. If you have any questions, I'm more than happy to answer them in the Issues section.
 
 ## Data Preparation
