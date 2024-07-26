@@ -1,6 +1,6 @@
 # TartanVO Fine-Tuning Project
 
-This project is based on the TartanVO model and focuses on fine-tuning it using several trajectories from the Euroc dataset. Follow the instructions below to successfully run the fine-tuning and evaluation processes.
+This project is based on the TartanVO model and focuses on fine-tuning it using several trajectories from the Euroc dataset. Follow the instructions below to successfully run the fine-tuning and evaluation processes.You need to first complete the TartanVO environment setup according to https://github.com/castacks/tartanvo to finish , and then delete the folders in TartanVO that are duplicated in my code, and replace them with my folders.
 
 ## Data Preparation
 
